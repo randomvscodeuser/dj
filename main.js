@@ -2,27 +2,29 @@ music1 = "";
 music2 = "";
 leftWristX = 0;
 leftWristY = 0;
+rightWristX = 0;
+rightWristY = 0;
 scoreLeftWrist = 0;
 scoreRightWrist = 0;
 song = ""
 song1 = "";
 
-rightWristX = 0;
-rightWristY = 0;
+
 
 function setup(){
     canvas = createCanvas(500, 400);
     canvas.center();
     video = createCapture(VIDEO);
     video.hide();
+    poseNet = ml5.poseNet(video, modelLoaded);
+    poseNet.on('pose', gotPoses);
 }
 
 function preload(){
     music1 = loadSound("pixel_pig.mp3");
     music2 = loadSound("dj.mp3");
 
-    poseNet = ml5.poseNet(video, modelLoaded);
-    poseNet.on('pose', gotPoses);
+    
 }
 
 
@@ -31,10 +33,10 @@ function gotPoses(results){
         console.log(results);
         scoreLeftWrist = results[0].pose.keypoints[9].score;
         scoreRightWrist = results[0].pose.keypoints[10].score;
-        leftWristX = pose.leftWrist.x;
-        leftWristY = pose.lefftWrist.y;
-        rightWristX = pose.rightWrist.x;
-        rightWristY = pose.rightWrist.y;
+        leftWristX = results[0].pose.leftWrist.x;
+        leftWristY = results[0].pose.leftWrist.y;
+        rightWristX = results[0].pose.rightWrist.x;
+        rightWristY = results[0].pose.rightWrist.y;
         console.log("leftwristx = " + leftWristX + "leftwristy = " + leftWristY);
         console.log("rightwristx = " + rightWristX + "rightwristy" + rightWristY);
     }
@@ -54,10 +56,12 @@ function draw(){
         }
     }
 
+    song2 = music2.isPlaying();
+
     if(scoreRightWrist > 0.2){
         circle(rightWristX, rightWristY, 20);
         music1.stop();
-        if(song1 == true)
+        if(song2 == false)
         music2.play()
         document.getElementById("song").innerHTML = "playing - the second song"
 
